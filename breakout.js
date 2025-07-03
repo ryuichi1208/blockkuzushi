@@ -114,8 +114,8 @@ class BreakoutGame {
         this.state = GameState.MENU;
         this.score = 0;
         this.lives = 3;
-        this.level = 3; // デフォルトレベル
-        this.selectedLevel = 3; // 選択されたレベル
+        this.level = this.isMobile ? 1 : 3; // デフォルトレベル（モバイルは1）
+        this.selectedLevel = this.isMobile ? 1 : 3; // 選択されたレベル
         
         // ゲームオブジェクト
         this.paddle = null;
@@ -167,6 +167,14 @@ class BreakoutGame {
         // イベントリスナーの設定
         this.setupEventListeners();
         this.setupLevelButtons();
+        
+        // モバイルの場合はデフォルトでレベル1を選択
+        if (this.isMobile) {
+            const activeBtn = document.querySelector('.level-btn.active');
+            if (activeBtn) activeBtn.classList.remove('active');
+            const level1Btn = document.querySelector('.level-btn[data-level="1"]');
+            if (level1Btn) level1Btn.classList.add('active');
+        }
         
         // ゲームループの開始
         this.lastTime = 0;
@@ -298,9 +306,9 @@ class BreakoutGame {
     }
 
     initGameObjects() {
-        // パドルの初期化（幅を広げる）
-        const paddleWidth = 120;
-        const paddleHeight = 10;
+        // パドルの初期化（モバイルではさらに幅を広げる）
+        const paddleWidth = this.isMobile ? 150 : 120;
+        const paddleHeight = this.isMobile ? 15 : 10;
         this.paddle = new Paddle(
             this.canvas.width / 2 - paddleWidth / 2,
             this.canvas.height - 50,
@@ -308,13 +316,15 @@ class BreakoutGame {
             paddleHeight
         );
         
-        // レベルに応じたボール速度の設定
+        // レベルに応じたボール速度の設定（モバイルは遅め）
         this.ball = new Ball(
             this.canvas.width / 2,
             this.paddle.y - 20,
-            8
+            this.isMobile ? 10 : 8  // モバイルではボールも少し大きく
         );
-        const baseSpeed = 200 + (this.selectedLevel - 1) * 50; // レベル1: 200, レベル5: 400
+        const baseSpeed = this.isMobile ? 
+            150 + (this.selectedLevel - 1) * 30 :  // モバイル: レベル1: 150, レベル2: 180
+            200 + (this.selectedLevel - 1) * 50;   // PC: レベル1: 200, レベル5: 400
         this.ball.vx = (Math.random() > 0.5 ? 1 : -1) * baseSpeed;
         this.ball.vy = -(baseSpeed + 100);
         
@@ -330,16 +340,16 @@ class BreakoutGame {
         
         switch(this.selectedLevel) {
             case 1: // かんたん
-                blockWidth = 60;
-                blockHeight = 24;
+                blockWidth = this.isMobile ? 80 : 60;  // モバイルではさらに大きく
+                blockHeight = this.isMobile ? 32 : 24;
                 blockCols = Math.floor((this.canvas.width - 20) / (blockWidth + blockPadding));
-                blockRows = Math.floor((paddleTop - offsetTop - safeMargin) / (blockHeight + blockPadding));
+                blockRows = this.isMobile ? 4 : Math.floor((paddleTop - offsetTop - safeMargin) / (blockHeight + blockPadding));
                 break;
             case 2: // ふつう
-                blockWidth = 45;
-                blockHeight = 18;
+                blockWidth = this.isMobile ? 60 : 45;  // モバイルでは大きく
+                blockHeight = this.isMobile ? 24 : 18;
                 blockCols = Math.floor((this.canvas.width - 20) / (blockWidth + blockPadding));
-                blockRows = Math.floor((paddleTop - offsetTop - safeMargin) / (blockHeight + blockPadding));
+                blockRows = this.isMobile ? 6 : Math.floor((paddleTop - offsetTop - safeMargin) / (blockHeight + blockPadding));
                 break;
             case 3: // 標準
                 blockWidth = 30;

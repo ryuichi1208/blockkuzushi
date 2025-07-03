@@ -201,6 +201,13 @@ h1 {
     display: none;
 }
 
+/* モバイルでレベル3以上を非表示 */
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
     h1 {
