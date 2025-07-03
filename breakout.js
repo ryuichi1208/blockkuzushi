@@ -122,6 +122,9 @@ class BreakoutGame {
         this.ball = null;
         this.blocks = [];
         
+        // WebAssembly衝突判定
+        this.wasmCollision = null;
+        
         // 入力状態
         this.keys = {};
         this.mouseX = 0;
@@ -168,6 +171,8 @@ class BreakoutGame {
         this.setupEventListeners();
         this.setupLevelButtons();
         
+        // WebAssemblyモジュールの初期化
+        this.initWASM();
         
         // ゲームループの開始
         this.lastTime = 0;
@@ -176,6 +181,27 @@ class BreakoutGame {
         
         // 初期メッセージを表示
         this.showMessage(this.isMobile ? 'タップでゲーム開始' : 'スペースキーでゲーム開始');
+    }
+    
+    // WebAssemblyモジュールの初期化
+    async initWASM() {
+        try {
+            // ローカルファイルプロトコルの場合はWASMを無効化
+            if (window.location.protocol === 'file:') {
+                console.log('ローカルファイルのため、WebAssemblyを無効化します');
+                console.log('HTTPサーバーで実行するとWebAssemblyが有効になります');
+                return;
+            }
+            
+            if (typeof WASMCollisionDetector !== 'undefined') {
+                this.wasmCollision = new WASMCollisionDetector();
+                await this.wasmCollision.init();
+                console.log('WebAssembly衝突判定を有効化しました');
+            }
+        } catch (error) {
+            console.warn('WebAssembly初期化エラー:', error);
+            console.log('JavaScript衝突判定を使用します');
+        }
     }
     
     // Web Audio APIを使用したシンプルな音生成（AudioContextを再利用）
@@ -388,10 +414,15 @@ class BreakoutGame {
     }
 
     nextLevel() {
-        this.level++;
-        this.initGameObjects();
-        this.state = GameState.PLAYING;
-        this.hideMessage();
+        if (this.level >= 3) {
+            // 最終レベルクリア後はリセット
+            this.resetGame();
+        } else {
+            this.level++;
+            this.initGameObjects();
+            this.state = GameState.PLAYING;
+            this.hideMessage();
+        }
     }
 
     updateBall(dt) {
@@ -443,15 +474,19 @@ class BreakoutGame {
         }
         
         // ブロックとの衝突判定
-        for (let i = this.blocks.length - 1; i >= 0; i--) {
-            const block = this.blocks[i];
-            if (this.ball.intersects(block)) {
+        if (this.wasmCollision && this.wasmCollision.ready) {
+            // WebAssemblyを使用した高速な衝突判定
+            const hitIndices = this.wasmCollision.checkBlockCollisions(this.ball, this.blocks);
+            
+            if (hitIndices.length > 0) {
+                // 最初に衝突したブロックを処理
+                const index = hitIndices[0];
+                const block = this.blocks[index];
+                
                 if (block.hit()) {
-                    this.blocks.splice(i, 1);
+                    this.blocks.splice(index, 1);
                     this.score += block.points;
                     this.updateUI();
-                    
-                    // ブロックが消えた時の効果音
                     this.sounds.blockHit();
                 }
                 
@@ -466,15 +501,52 @@ class BreakoutGame {
                 } else {
                     this.ball.vy = -this.ball.vy;
                 }
-                
-                break;
+            }
+        } else {
+            // JavaScript版のフォールバック
+            for (let i = this.blocks.length - 1; i >= 0; i--) {
+                const block = this.blocks[i];
+                if (this.ball.intersects(block)) {
+                    if (block.hit()) {
+                        this.blocks.splice(i, 1);
+                        this.score += block.points;
+                        this.updateUI();
+                        
+                        // ブロックが消えた時の効果音
+                        this.sounds.blockHit();
+                    }
+                    
+                    // 反射方向の決定
+                    const ballCenterX = this.ball.getCenterX();
+                    const ballCenterY = this.ball.getCenterY();
+                    const blockCenterX = block.x + block.width / 2;
+                    const blockCenterY = block.y + block.height / 2;
+                    
+                    if (Math.abs(ballCenterX - blockCenterX) > Math.abs(ballCenterY - blockCenterY)) {
+                        this.ball.vx = -this.ball.vx;
+                    } else {
+                        this.ball.vy = -this.ball.vy;
+                    }
+                    
+                    break;
+                }
             }
         }
         
         // 全ブロック破壊チェック
         if (this.blocks.length === 0) {
             this.state = GameState.GAME_CLEAR;
-            this.showMessage(this.isMobile ? 'レベルクリア！<br>タップで次のレベルへ' : 'レベルクリア！<br>スペースキーで次のレベルへ');
+            
+            // レベル3（最終レベル）クリア時は特別なメッセージ
+            if (this.level === 3) {
+                this.showMessage(this.isMobile ? 
+                    '🎉 おめでとう！🎉<br>全レベルクリア！<br>スコア: ' + this.score + '<br>タップでもう一度' : 
+                    '🎉 おめでとう！🎉<br>全レベルクリア！<br>スコア: ' + this.score + '<br>スペースキーでもう一度');
+            } else {
+                this.showMessage(this.isMobile ? 
+                    '✨ おめでとう！✨<br>レベル' + this.level + 'クリア！<br>タップで次のレベルへ' : 
+                    '✨ おめでとう！✨<br>レベル' + this.level + 'クリア！<br>スペースキーで次のレベルへ');
+            }
             this.sounds.levelClear();
         }
     }
