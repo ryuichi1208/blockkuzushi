@@ -342,9 +342,9 @@ class BreakoutGame {
             this.paddle.y - 20,
             8
         );
-        const baseSpeed = 180 + (this.selectedLevel - 1) * 60;  // レベル1: 180, レベル2: 240, レベル3: 300
+        const baseSpeed = 300 + (this.selectedLevel - 1) * 80;  // レベル1: 300, レベル2: 380, レベル3: 460
         this.ball.vx = (Math.random() > 0.5 ? 1 : -1) * baseSpeed;
-        this.ball.vy = -(baseSpeed + 100);
+        this.ball.vy = -(baseSpeed + 150);
         
         // レベルに応じたブロックの初期化
         this.blocks = [];
@@ -453,9 +453,9 @@ class BreakoutGame {
                 // ボールをリセット（レベルに応じた速度）
                 this.ball.x = this.paddle.x + this.paddle.width / 2 - this.ball.radius;
                 this.ball.y = this.paddle.y - this.ball.height - 5;
-                const baseSpeed = 200 + (this.selectedLevel - 1) * 50;
+                const baseSpeed = 300 + (this.selectedLevel - 1) * 80;
                 this.ball.vx = (Math.random() > 0.5 ? 1 : -1) * baseSpeed;
-                this.ball.vy = -(baseSpeed + 100);
+                this.ball.vy = -(baseSpeed + 150);
                 this.state = GameState.PAUSED;
                 this.showMessage(this.isMobile ? 'ボールを失いました<br>タップで続行' : 'ボールを失いました<br>スペースキーで続行');
             }
