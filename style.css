@@ -115,6 +115,64 @@ h1 {
     margin-right: 10px;
 }
 
+/* レベル選択 */
+.level-selector {
+    margin-top: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.level-selector h3 {
+    color: #ffd700;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.level-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.level-btn {
+    background: linear-gradient(135deg, #3a4da8 0%, #2a3d7f 100%);
+    color: #fff;
+    border: 2px solid transparent;
+    padding: 15px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-width: 100px;
+}
+
+.level-btn:hover {
+    background: linear-gradient(135deg, #4a5db8 0%, #3a4d8f 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.level-btn.active {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #333;
+    border-color: #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.level-desc {
+    font-size: 0.8em;
+    opacity: 0.8;
+    display: block;
+    margin-top: 5px;
+}
+
+.level-selector.hidden {
+    display: none;
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
     h1 {

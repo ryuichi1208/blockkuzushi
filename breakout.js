@@ -114,7 +114,8 @@ class BreakoutGame {
         this.state = GameState.MENU;
         this.score = 0;
         this.lives = 3;
-        this.level = 1;
+        this.level = 3; // デフォルトレベル
+        this.selectedLevel = 3; // 選択されたレベル
         
         // ゲームオブジェクト
         this.paddle = null;
@@ -149,9 +150,11 @@ class BreakoutGame {
         this.livesElement = document.getElementById('lives');
         this.levelElement = document.getElementById('level');
         this.messageElement = document.getElementById('gameMessage');
+        this.levelSelectorElement = document.getElementById('levelSelector');
         
         // イベントリスナーの設定
         this.setupEventListeners();
+        this.setupLevelButtons();
         
         // ゲームループの開始
         this.lastTime = 0;
@@ -209,6 +212,26 @@ class BreakoutGame {
         });
     }
 
+    setupLevelButtons() {
+        const levelButtons = document.querySelectorAll('.level-btn');
+        levelButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                if (this.state === GameState.MENU) {
+                    // 現在のアクティブボタンを解除
+                    document.querySelector('.level-btn.active').classList.remove('active');
+                    // 新しいボタンをアクティブに
+                    button.classList.add('active');
+                    // レベルを設定
+                    this.selectedLevel = parseInt(button.dataset.level);
+                    this.level = this.selectedLevel;
+                    this.updateUI();
+                    // 効果音を鳴らす
+                    this.playSound(550, 0.1);
+                }
+            });
+        });
+    }
+
     handleKeyPress(key) {
         if (key === ' ') {
             if (this.state === GameState.MENU) {
@@ -240,25 +263,57 @@ class BreakoutGame {
             paddleHeight
         );
         
-        // ボールの初期化（速度を上げる）
+        // レベルに応じたボール速度の設定
         this.ball = new Ball(
             this.canvas.width / 2,
             this.paddle.y - 20,
             8
         );
-        this.ball.vx = (Math.random() > 0.5 ? 1 : -1) * 250;
-        this.ball.vy = -350;
+        const baseSpeed = 200 + (this.selectedLevel - 1) * 50; // レベル1: 200, レベル5: 400
+        this.ball.vx = (Math.random() > 0.5 ? 1 : -1) * baseSpeed;
+        this.ball.vy = -(baseSpeed + 100);
         
-        // ブロックの初期化（パドルギリギリまで配置）
+        // レベルに応じたブロックの初期化
         this.blocks = [];
-        const blockWidth = 30;
-        const blockHeight = 12;
+        
+        // レベルごとのブロック設定
+        let blockWidth, blockHeight, blockRows, blockCols;
         const blockPadding = 1;
         const offsetTop = 10;
-        const paddleTop = this.canvas.height - 50;  // パドルの位置
-        const availableHeight = paddleTop - offsetTop - 30;  // パドルから30px上まで
-        const blockRows = Math.floor(availableHeight / (blockHeight + blockPadding)) - 5;  // 下から5列削除
-        const blockCols = Math.floor(this.canvas.width / (blockWidth + blockPadding));
+        
+        switch(this.selectedLevel) {
+            case 1: // かんたん
+                blockWidth = 60;
+                blockHeight = 24;
+                blockRows = 5;
+                blockCols = Math.floor((this.canvas.width - 20) / (blockWidth + blockPadding));
+                break;
+            case 2: // ふつう
+                blockWidth = 45;
+                blockHeight = 18;
+                blockRows = 8;
+                blockCols = Math.floor((this.canvas.width - 20) / (blockWidth + blockPadding));
+                break;
+            case 3: // 標準
+                blockWidth = 30;
+                blockHeight = 12;
+                blockRows = 12;
+                blockCols = Math.floor(this.canvas.width / (blockWidth + blockPadding));
+                break;
+            case 4: // むずかしい
+                blockWidth = 25;
+                blockHeight = 10;
+                blockRows = 15;
+                blockCols = Math.floor(this.canvas.width / (blockWidth + blockPadding));
+                break;
+            case 5: // 超むずかしい
+                blockWidth = 20;
+                blockHeight = 8;
+                blockRows = 20;
+                blockCols = Math.floor(this.canvas.width / (blockWidth + blockPadding));
+                break;
+        }
+        
         const offsetLeft = (this.canvas.width - (blockCols * (blockWidth + blockPadding))) / 2;
         
         const colors = ['#ff6b6b', '#f06292', '#ba68c8', '#7986cb', '#64b5f6', 
@@ -278,18 +333,21 @@ class BreakoutGame {
     }
 
     startGame() {
+        this.level = this.selectedLevel;
         this.initGameObjects();
         this.state = GameState.PLAYING;
         this.hideMessage();
+        this.hideLevelSelector();
     }
 
     resetGame() {
         this.score = 0;
         this.lives = 3;
-        this.level = 1;
+        this.level = this.selectedLevel;
         this.updateUI();
         this.state = GameState.MENU;
         this.showMessage('スペースキーでゲーム開始');
+        this.showLevelSelector();
     }
 
     nextLevel() {
@@ -324,11 +382,12 @@ class BreakoutGame {
                 this.showMessage('ゲームオーバー<br>スペースキーでリトライ');
                 this.sounds.gameOver();
             } else {
-                // ボールをリセット（速度を上げる）
+                // ボールをリセット（レベルに応じた速度）
                 this.ball.x = this.paddle.x + this.paddle.width / 2 - this.ball.radius;
                 this.ball.y = this.paddle.y - this.ball.height - 5;
-                this.ball.vx = (Math.random() > 0.5 ? 1 : -1) * 250;
-                this.ball.vy = -350;
+                const baseSpeed = 200 + (this.selectedLevel - 1) * 50;
+                this.ball.vx = (Math.random() > 0.5 ? 1 : -1) * baseSpeed;
+                this.ball.vy = -(baseSpeed + 100);
                 this.state = GameState.PAUSED;
                 this.showMessage('ボールを失いました<br>スペースキーで続行');
             }
@@ -446,6 +505,14 @@ class BreakoutGame {
 
     hideMessage() {
         this.messageElement.classList.add('hidden');
+    }
+
+    hideLevelSelector() {
+        this.levelSelectorElement.classList.add('hidden');
+    }
+
+    showLevelSelector() {
+        this.levelSelectorElement.classList.remove('hidden');
     }
 
     animate(currentTime) {
