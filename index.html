@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ブロック崩しゲーム</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>BREAKOUT</h1>
+        
+        <div class="game-info">
+            <div class="info-item">
+                <span class="label">スコア:</span>
+                <span id="score">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">ライフ:</span>
+                <span id="lives">3</span>
+            </div>
+            <div class="info-item">
+                <span class="label">レベル:</span>
+                <span id="level">1</span>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <div id="gameMessage" class="game-message">
+            <p>スペースキーでゲーム開始</p>
+        </div>
+        
+        <div class="controls">
+            <h3>操作方法</h3>
+            <ul>
+                <li><strong>←/→キー</strong> または <strong>マウス</strong>: パドルを移動</li>
+                <li><strong>スペースキー</strong>: ゲーム開始/一時停止</li>
+                <li><strong>Rキー</strong>: ゲームリセット</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="breakout.js"></script>
+</body>
+</html>

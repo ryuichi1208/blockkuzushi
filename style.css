@@ -1,0 +1,169 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-container {
+    text-align: center;
+    padding: 20px;
+    max-width: 900px;
+    width: 100%;
+}
+
+h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 3px;
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.game-info {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.info-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.label {
+    margin-right: 10px;
+    opacity: 0.8;
+}
+
+#score, #lives, #level {
+    font-weight: bold;
+    color: #ffd700;
+}
+
+#gameCanvas {
+    border: 3px solid #fff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    background: #000;
+    display: block;
+    margin: 0 auto;
+    cursor: none;
+}
+
+.game-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 30px 50px;
+    border-radius: 10px;
+    font-size: 1.5em;
+    text-align: center;
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.game-message.hidden {
+    display: none;
+}
+
+.controls {
+    margin-top: 30px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.controls h3 {
+    margin-bottom: 15px;
+    color: #ffd700;
+}
+
+.controls ul {
+    list-style: none;
+    text-align: left;
+    display: inline-block;
+}
+
+.controls li {
+    margin: 10px 0;
+    font-size: 1.1em;
+}
+
+.controls strong {
+    color: #ffd700;
+    margin-right: 10px;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2em;
+    }
+    
+    .game-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .info-item {
+        display: inline-block;
+    }
+    
+    #gameCanvas {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .controls {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-container {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
+    
+    .game-info {
+        font-size: 1em;
+    }
+    
+    .controls {
+        padding: 15px;
+    }
+    
+    .controls h3 {
+        font-size: 1.1em;
+    }
+    
+    .controls li {
+        font-size: 0.9em;
+        margin: 5px 0;
+    }
+}
