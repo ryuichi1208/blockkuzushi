@@ -88,6 +88,7 @@ h1 {
     display: block;
     margin: 0 auto;
     cursor: none;
+    touch-action: none;
 }
 
 .game-message {
@@ -171,6 +172,9 @@ h1 {
     transition: all 0.3s ease;
     text-align: center;
     min-width: 100px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .level-btn:hover {

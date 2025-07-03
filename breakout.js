@@ -218,6 +218,36 @@ class BreakoutGame {
             const rect = this.canvas.getBoundingClientRect();
             this.mouseX = e.clientX - rect.left;
         });
+        
+        // タッチイベント
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = this.canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            this.mouseX = touch.clientX - rect.left;
+            
+            // タップでゲーム開始/一時停止
+            if (this.state === GameState.MENU) {
+                this.startGame();
+            } else if (this.state === GameState.PLAYING) {
+                this.state = GameState.PAUSED;
+                this.showMessage('一時停止中');
+            } else if (this.state === GameState.PAUSED) {
+                this.state = GameState.PLAYING;
+                this.hideMessage();
+            }
+        });
+        
+        this.canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const rect = this.canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            this.mouseX = touch.clientX - rect.left;
+        });
+        
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+        });
     }
 
     setupLevelButtons() {
