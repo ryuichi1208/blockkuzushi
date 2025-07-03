@@ -145,6 +145,10 @@ class BreakoutGame {
         // AudioContextを一度だけ作成して再利用
         this.audioContext = null;
         
+        // モバイルデバイスかどうかを判定
+        this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+                        ('ontouchstart' in window);
+        
         // サウンドエフェクト
         this.sounds = {
             blockHit: () => this.playSound(440, 0.1),  // A4音
@@ -168,6 +172,9 @@ class BreakoutGame {
         this.lastTime = 0;
         this.animate = this.animate.bind(this);
         requestAnimationFrame(this.animate);
+        
+        // 初期メッセージを表示
+        this.showMessage(this.isMobile ? 'タップでゲーム開始' : 'スペースキーでゲーム開始');
     }
     
     // Web Audio APIを使用したシンプルな音生成（AudioContextを再利用）
@@ -386,7 +393,7 @@ class BreakoutGame {
         this.level = this.selectedLevel;
         this.updateUI();
         this.state = GameState.MENU;
-        this.showMessage('スペースキーでゲーム開始');
+        this.showMessage(this.isMobile ? 'タップでゲーム開始' : 'スペースキーでゲーム開始');
         this.showLevelSelector();
     }
 
@@ -419,7 +426,7 @@ class BreakoutGame {
             
             if (this.lives <= 0) {
                 this.state = GameState.GAME_OVER;
-                this.showMessage('ゲームオーバー<br>スペースキーでリトライ');
+                this.showMessage(this.isMobile ? 'ゲームオーバー<br>タップでリトライ' : 'ゲームオーバー<br>スペースキーでリトライ');
                 this.sounds.gameOver();
             } else {
                 // ボールをリセット（レベルに応じた速度）
@@ -429,7 +436,7 @@ class BreakoutGame {
                 this.ball.vx = (Math.random() > 0.5 ? 1 : -1) * baseSpeed;
                 this.ball.vy = -(baseSpeed + 100);
                 this.state = GameState.PAUSED;
-                this.showMessage('ボールを失いました<br>スペースキーで続行');
+                this.showMessage(this.isMobile ? 'ボールを失いました<br>タップで続行' : 'ボールを失いました<br>スペースキーで続行');
             }
         }
         
@@ -477,7 +484,7 @@ class BreakoutGame {
         // 全ブロック破壊チェック
         if (this.blocks.length === 0) {
             this.state = GameState.GAME_CLEAR;
-            this.showMessage('レベルクリア！<br>スペースキーで次のレベルへ');
+            this.showMessage(this.isMobile ? 'レベルクリア！<br>タップで次のレベルへ' : 'レベルクリア！<br>スペースキーで次のレベルへ');
             this.sounds.levelClear();
         }
     }
