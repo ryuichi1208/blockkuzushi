@@ -25,7 +25,8 @@
             </div>
         </div>
         
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <canvas id="fireworksCanvas" width="1200" height="800" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0;"></canvas>
+        <canvas id="gameCanvas" width="800" height="600" style="position: relative; z-index: 1;"></canvas>
         
         <div id="gameMessage" class="game-message">
             <p></p>
@@ -51,6 +52,7 @@
     </div>
     
     <script src="wasm-loader.js"></script>
+    <script src="webgl-renderer.js"></script>
     <script src="breakout.js"></script>
 </body>
 </html>
