@@ -134,6 +134,14 @@ class BreakoutGame {
             this.backgroundLoaded = true;
         };
         
+        // タイトル画像
+        this.titleImage = new Image();
+        this.titleImage.src = 'img/title.png';
+        this.titleImageLoaded = false;
+        this.titleImage.onload = () => {
+            this.titleImageLoaded = true;
+        };
+        
         // AudioContextを一度だけ作成して再利用
         this.audioContext = null;
         
@@ -280,37 +288,39 @@ class BreakoutGame {
         let blockWidth, blockHeight, blockRows, blockCols;
         const blockPadding = 1;
         const offsetTop = 10;
+        const paddleTop = this.paddle.y;  // パドルの上端位置
+        const safeMargin = 80;  // パドルからの安全マージン
         
         switch(this.selectedLevel) {
             case 1: // かんたん
                 blockWidth = 60;
                 blockHeight = 24;
-                blockRows = 5;
                 blockCols = Math.floor((this.canvas.width - 20) / (blockWidth + blockPadding));
+                blockRows = Math.floor((paddleTop - offsetTop - safeMargin) / (blockHeight + blockPadding));
                 break;
             case 2: // ふつう
                 blockWidth = 45;
                 blockHeight = 18;
-                blockRows = 8;
                 blockCols = Math.floor((this.canvas.width - 20) / (blockWidth + blockPadding));
+                blockRows = Math.floor((paddleTop - offsetTop - safeMargin) / (blockHeight + blockPadding));
                 break;
             case 3: // 標準
                 blockWidth = 30;
                 blockHeight = 12;
-                blockRows = 12;
                 blockCols = Math.floor(this.canvas.width / (blockWidth + blockPadding));
+                blockRows = Math.floor((paddleTop - offsetTop - safeMargin) / (blockHeight + blockPadding));
                 break;
             case 4: // むずかしい
                 blockWidth = 25;
                 blockHeight = 10;
-                blockRows = 15;
                 blockCols = Math.floor(this.canvas.width / (blockWidth + blockPadding));
+                blockRows = Math.floor((paddleTop - offsetTop - safeMargin) / (blockHeight + blockPadding));
                 break;
             case 5: // 超むずかしい
                 blockWidth = 20;
                 blockHeight = 8;
-                blockRows = 20;
                 blockCols = Math.floor(this.canvas.width / (blockWidth + blockPadding));
+                blockRows = Math.floor((paddleTop - offsetTop - safeMargin) / (blockHeight + blockPadding));
                 break;
         }
         
@@ -477,7 +487,20 @@ class BreakoutGame {
             this.ctx.drawImage(this.backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
         }
         
-        // ブロックの描画（不透明）
+        // メニュー画面でタイトル画像を描画（ブロックの下に）
+        if (this.state === GameState.MENU && this.titleImageLoaded) {
+            // タイトル画像をCanvasの中央に描画
+            const imgWidth = Math.min(600, this.canvas.width * 0.8);
+            const imgHeight = (this.titleImage.height / this.titleImage.width) * imgWidth;
+            const imgX = (this.canvas.width - imgWidth) / 2;
+            const imgY = (this.canvas.height - imgHeight) / 2 - 50;
+            
+            this.ctx.globalAlpha = 0.8;
+            this.ctx.drawImage(this.titleImage, imgX, imgY, imgWidth, imgHeight);
+            this.ctx.globalAlpha = 1.0;
+        }
+        
+        // ブロックの描画（不透明）- タイトル画像の上に描画される
         this.blocks.forEach(block => {
             block.draw(this.ctx);
         });
